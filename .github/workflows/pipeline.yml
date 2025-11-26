@@ -1,0 +1,42 @@
+name: ManyNorms – Data Pipeline
+
+on:
+  # run manually from the Actions tab
+  workflow_dispatch:
+
+  # OPTIONAL: uncomment if you want it to run on every push to main
+  # push:
+  #   branches: [ main ]
+
+  # OPTIONAL: run every night at 2am UTC
+  # schedule:
+  #   - cron: "0 2 * * *"
+
+jobs:
+  get-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Step 01 – getData
+        run: |
+          python src/manynorms_pipeline/01.getData.py
+
+      # Optional: upload the CSV so you can download it from the Actions UI
+      - name: Upload raw data CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-data-to-classify
+          path: data/raw/new_data_to_classify.csv
